@@ -11,7 +11,13 @@
                 <h1 class="section-title">Best Phrase:</h1>
                 <h2 id="best-phrase">To be or not to be</h1>
                 <div class="options-and-controls">
-                    <h2 class="label" id="generations">Generations: 0</h2>
+                    <h2 class="label" id="generations">Total Generations: 0</h2>
+                    <h2 class="label" id="avgFitness">Average Fitness: 0%</h2>
+                    <label class="label" style="display: inline-block;" for="population">Total Population:</label>
+                    <input type="number" class="input" id="population" name="population" min="1" max="10000" value="500" step="10">
+                    <br>
+                    <label class="label" style="display: inline-block;" for="mutationRate">Mutation Rate:</label>
+                    <input type="number" class="input" id="mutationRate" name="mutationRate" min="0" max="1" value="0.01" step="0.01">
                 </div>
             </div>
         </main>

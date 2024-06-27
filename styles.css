@@ -20,7 +20,7 @@
 }
 
 .section-title {
-    font-weight: 600;
+    font-weight: 400;
     font-size: 44px; 
 }
 
@@ -29,6 +29,19 @@
 }
 
 #best-phrase {
-    font-weight: 400;
+    font-weight: 600;
+    font-size: 48px;
+}
+
+.label {
+    margin-top: 0.25em;
+    margin-bottom: 0.25em;
+    font-weight: 500;
     font-size: 32px;
+}
+
+.input {
+    display: inline-block;
+    height: 100%;
+    font-size: 26px;
 }
