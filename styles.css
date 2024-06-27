@@ -1,0 +1,34 @@
+.title {
+    font-size: 64px;
+    margin-block-end: 0.3em;
+}
+
+.body-content {
+    height: 100%;
+    padding-left: 2rem;
+    padding-right: 2rem;
+}
+
+.main-content {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+}
+
+.main-section {
+    width: auto;
+}
+
+.section-title {
+    font-weight: 600;
+    font-size: 44px; 
+}
+
+.options-and-controls {
+    padding-top: 1rem;
+}
+
+#best-phrase {
+    font-weight: 400;
+    font-size: 32px;
+}
