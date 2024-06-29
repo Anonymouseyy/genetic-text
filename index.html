@@ -2,7 +2,7 @@
 <html>
     <head>
         <link href="styles.css" rel="stylesheet">
-        <script src="script.js"></script>
+        
     </head>
     <body class="body-content">
         <h1 class="title">Genetic Text</h1>
@@ -21,10 +21,10 @@
                     <br>
                     <label class="label" style="display: inline-block;" for="target">Target Phrase:</label>
                     <input type="text" class="input" id="target" name="target" maxlength="50">
+                    <p class="details">(Characters and numbers only)</p>
                     <br><br>
-                    <button class="control-button">Start</button>
-                    <button class="control-button">Pause</button>
-                    <button class="control-button">Cancel</button>
+                    <button class="control-button" id="start">Start</button>
+                    <button class="control-button" id="cancel">Cancel</button>
                 </div>
             </div>
             <div class="main-section">
@@ -33,4 +33,5 @@
             </div>
         </main>
     </body>
+    <script src="script.js"></script>
 </html>

@@ -17,7 +17,7 @@
 }
 
 .main-section {
-    width: 30vw;
+    width: auto;
 }
 
 .section-title {
@@ -53,4 +53,9 @@
 
 .control-button {
     font-size: 32px;
+}
+
+.details {
+    margin-top: 2px;
+    margin-bottom: 0px;
 }
