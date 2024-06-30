@@ -37,7 +37,7 @@ function selectRandom(probabilities, sum=undefined) {
         probabilities.reduce((a, b) => a + b, 0)
     }
 
-    let winner = Math.random()*totalFitScore;
+    let winner = Math.random()*sum;
     let threshold = 0;
     for (let i = 0; i < probabilities.length; i++) {
         threshold += parseFloat(probabilities[i]);
@@ -49,16 +49,18 @@ function selectRandom(probabilities, sum=undefined) {
 }
 
 function mutate(str, mutRate) {
+    console.log(mutRate)
     const charactersLength = characters.length;
 
     for (i in str) {
         if (Math.random() < mutRate) {
             str = str.substring(0, i) + 
             characters.charAt(Math.floor(Math.random() * charactersLength)) + 
-            str.substring(index+1);
+            str.substring(i+1);
         }
-        
     }
+
+    return str;
 }
 
 
@@ -91,12 +93,12 @@ async function runSimulation(popSize, mutRate, targetPhrase) {
     for (i in population) {
         let x = getFitness(population[i], targetPhrase)
 
-        if (x === 1) {
-            return;
-        }
         if (x > bestScore) {
             bestPhrase = population[i];
             bestScore = x;
+        }
+        if (x == 1) {
+            return;
         }
 
         fitness.push(x);
@@ -109,8 +111,10 @@ async function runSimulation(popSize, mutRate, targetPhrase) {
     document.getElementById("avgFitness").innerText = `Average Fitness: ${(avgFitness*100).toFixed(2)}%`;
     document.getElementById("bestPhrase").innerText = bestPhrase;
 
+    let newPop;
+
     while(true) {
-        let newPop = []
+        newPop = [];
         for (let i = 0; i < popSize; i++) {
             newPop.push(
                 mutate(
@@ -118,7 +122,33 @@ async function runSimulation(popSize, mutRate, targetPhrase) {
                 ), mutRate)
             );
         }
+        console.log(newPop)
 
-        
+        population = newPop;
+        document.getElementById("allPhrases").innerText += population.join("  |  ");
+
+        fitness = [];
+        totalFitScore = 0;
+        for (i in population) {
+            let x = getFitness(population[i], targetPhrase)
+            
+            if (x > bestScore) {
+                bestPhrase = population[i];
+                bestScore = x;
+            }
+            if (x == 1) {
+                break;
+            }
+            
+
+            fitness.push(x);
+            totalFitScore += x;
+        }
+
+        totalGenerations++;
+        avgFitness = (avgFitness + (totalFitScore/popSize))/2;
+        document.getElementById("generations").innerText = `Total Generations: ${totalGenerations}`;
+        document.getElementById("avgFitness").innerText = `Average Fitness: ${(avgFitness*100).toFixed(2)}%`;
+        document.getElementById("bestPhrase").innerText = bestPhrase;
     }
 }
