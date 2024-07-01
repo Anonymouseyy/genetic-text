@@ -28,7 +28,7 @@ function getFitness(str, target) {
 
 function cross(str1, str2) {
     let l = str1.length;
-    return str1.slice(0, Math.floor(l/2)) + str2.slice(Math.floor(l/2))
+    return str1.slice(0, Math.floor(l/2)) + str2.slice(Math.floor(l/2));
 }
 
 function selectRandom(probabilities, sum=undefined) {
@@ -49,14 +49,11 @@ function selectRandom(probabilities, sum=undefined) {
 }
 
 function mutate(str, mutRate) {
-    console.log(mutRate)
     const charactersLength = characters.length;
 
-    for (i in str) {
+    for (let i = 0; i < str.length; i++) {
         if (Math.random() < mutRate) {
-            str = str.substring(0, i) + 
-            characters.charAt(Math.floor(Math.random() * charactersLength)) + 
-            str.substring(i+1);
+            str = str.substring(0, i) + characters.charAt(Math.floor(Math.random() * charactersLength)) + str.substring(i+1);
         }
     }
 
@@ -78,7 +75,8 @@ document.getElementById("start").addEventListener("click", () => {
 });
 
 
-async function runSimulation(popSize, mutRate, targetPhrase) {
+function setupSimulation(popSize, targetPhrase) {
+    // transfer bestPhrase, bestScore, totalFitScore
     const length = targetPhrase.length;
     let population = [];
     for (let i = 0; i < popSize; i++) {
@@ -98,6 +96,11 @@ async function runSimulation(popSize, mutRate, targetPhrase) {
             bestScore = x;
         }
         if (x == 1) {
+            let totalGenerations = 1;
+            let avgFitness = totalFitScore/popSize;
+            document.getElementById("generations").innerText = `Total Generations: ${totalGenerations}`;
+            document.getElementById("avgFitness").innerText = `Average Fitness: ${(avgFitness*100).toFixed(2)}%`;
+            document.getElementById("bestPhrase").innerText = targetPhrase;
             return;
         }
 
@@ -111,44 +114,58 @@ async function runSimulation(popSize, mutRate, targetPhrase) {
     document.getElementById("avgFitness").innerText = `Average Fitness: ${(avgFitness*100).toFixed(2)}%`;
     document.getElementById("bestPhrase").innerText = bestPhrase;
 
-    let newPop;
+    return [bestPhrase, bestScore, totalFitScore, population, fitness]
+}
+
+function runSimulationStep(bestPhrase, bestScore, totalFitScore, population, fitness) {
+    let newPop = [];
+    for (let i = 0; i < popSize; i++) {
+        newPop.push(
+            mutate(
+                cross(population[selectRandom(fitness, totalFitScore)], population[selectRandom(fitness, totalFitScore)]
+            ), mutRate)
+        );
+    }
+    console.log(newPop)
+
+    population = newPop;
+    document.getElementById("allPhrases").innerText += population.join("  |  ");
+
+    fitness = [];
+    totalFitScore = 0;
+    for (i in population) {
+        let x = getFitness(population[i], targetPhrase)
+        
+        if (x > bestScore) {
+            bestPhrase = population[i];
+            bestScore = x;
+        }
+        if (x == 1) {
+            totalGenerations++;
+            avgFitness = (avgFitness + (totalFitScore/popSize))/2;
+            document.getElementById("generations").innerText = `Total Generations: ${totalGenerations}`;
+            document.getElementById("avgFitness").innerText = `Average Fitness: ${(avgFitness*100).toFixed(2)}%`;
+            document.getElementById("bestPhrase").innerText = targetPhrase;
+            return;
+        }
+            
+
+        fitness.push(x);
+        totalFitScore += x;
+    }
+
+    totalGenerations++;
+    avgFitness = (avgFitness + (totalFitScore/popSize))/2;
+    document.getElementById("generations").innerText = `Total Generations: ${totalGenerations}`;
+    document.getElementById("avgFitness").innerText = `Average Fitness: ${(avgFitness*100).toFixed(2)}%`;
+    document.getElementById("bestPhrase").innerText = bestPhrase;
+}
+
+
+async function runSimulation(popSize, mutRate, targetPhrase) {
+    let [bestPhrase, bestScore, totalFitScore, population, fitness] = setupSimulation(popSize, targetPhrase);
 
     while(true) {
-        newPop = [];
-        for (let i = 0; i < popSize; i++) {
-            newPop.push(
-                mutate(
-                    cross(population[selectRandom(fitness, totalFitScore)], population[selectRandom(fitness, totalFitScore)]
-                ), mutRate)
-            );
-        }
-        console.log(newPop)
-
-        population = newPop;
-        document.getElementById("allPhrases").innerText += population.join("  |  ");
-
-        fitness = [];
-        totalFitScore = 0;
-        for (i in population) {
-            let x = getFitness(population[i], targetPhrase)
-            
-            if (x > bestScore) {
-                bestPhrase = population[i];
-                bestScore = x;
-            }
-            if (x == 1) {
-                break;
-            }
-            
-
-            fitness.push(x);
-            totalFitScore += x;
-        }
-
-        totalGenerations++;
-        avgFitness = (avgFitness + (totalFitScore/popSize))/2;
-        document.getElementById("generations").innerText = `Total Generations: ${totalGenerations}`;
-        document.getElementById("avgFitness").innerText = `Average Fitness: ${(avgFitness*100).toFixed(2)}%`;
-        document.getElementById("bestPhrase").innerText = bestPhrase;
+        runSimulationStep(bestPhrase, bestScore, totalFitScore, population, fitness);
     }
 }
