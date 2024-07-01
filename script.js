@@ -1,4 +1,4 @@
-const characters = " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+const characters = " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789,.?!";
 
 function generateRandomString(length) {
     let result = "";
@@ -88,6 +88,7 @@ function setupSimulation(popSize, targetPhrase) {
     let totalFitScore = 0;
     let bestScore = -1;
     let bestPhrase;
+    let success = false;
     for (i in population) {
         let x = getFitness(population[i], targetPhrase)
 
@@ -96,12 +97,9 @@ function setupSimulation(popSize, targetPhrase) {
             bestScore = x;
         }
         if (x == 1) {
-            let totalGenerations = 1;
-            let avgFitness = totalFitScore/popSize;
-            document.getElementById("generations").innerText = `Total Generations: ${totalGenerations}`;
-            document.getElementById("avgFitness").innerText = `Average Fitness: ${(avgFitness*100).toFixed(2)}%`;
-            document.getElementById("bestPhrase").innerText = targetPhrase;
-            return;
+            bestPhrase = population[i];
+            bestScore = x;
+            success = true;
         }
 
         fitness.push(x);
@@ -114,10 +112,10 @@ function setupSimulation(popSize, targetPhrase) {
     document.getElementById("avgFitness").innerText = `Average Fitness: ${(avgFitness*100).toFixed(2)}%`;
     document.getElementById("bestPhrase").innerText = bestPhrase;
 
-    return [bestPhrase, bestScore, totalFitScore, population, fitness]
+    return [bestPhrase, bestScore, totalFitScore, population, fitness, totalGenerations, avgFitness, success];
 }
 
-function runSimulationStep(bestPhrase, bestScore, totalFitScore, population, fitness) {
+function runSimulationStep(bestPhrase, bestScore, totalFitScore, population, fitness, popSize, mutRate, targetPhrase, totalGenerations, avgFitness) {
     let newPop = [];
     for (let i = 0; i < popSize; i++) {
         newPop.push(
@@ -129,10 +127,11 @@ function runSimulationStep(bestPhrase, bestScore, totalFitScore, population, fit
     console.log(newPop)
 
     population = newPop;
-    document.getElementById("allPhrases").innerText += population.join("  |  ");
+    document.getElementById("allPhrases").innerText = population.join("  |  ") + document.getElementById("allPhrases").innerText;
 
     fitness = [];
     totalFitScore = 0;
+    let success = false;
     for (i in population) {
         let x = getFitness(population[i], targetPhrase)
         
@@ -141,12 +140,9 @@ function runSimulationStep(bestPhrase, bestScore, totalFitScore, population, fit
             bestScore = x;
         }
         if (x == 1) {
-            totalGenerations++;
-            avgFitness = (avgFitness + (totalFitScore/popSize))/2;
-            document.getElementById("generations").innerText = `Total Generations: ${totalGenerations}`;
-            document.getElementById("avgFitness").innerText = `Average Fitness: ${(avgFitness*100).toFixed(2)}%`;
-            document.getElementById("bestPhrase").innerText = targetPhrase;
-            return;
+            bestPhrase = targetPhrase;
+            bestScore = x;
+            success = true;
         }
             
 
@@ -159,13 +155,23 @@ function runSimulationStep(bestPhrase, bestScore, totalFitScore, population, fit
     document.getElementById("generations").innerText = `Total Generations: ${totalGenerations}`;
     document.getElementById("avgFitness").innerText = `Average Fitness: ${(avgFitness*100).toFixed(2)}%`;
     document.getElementById("bestPhrase").innerText = bestPhrase;
+
+    return [bestPhrase, bestScore, totalFitScore, population, fitness, totalGenerations, avgFitness, success];
 }
 
 
 async function runSimulation(popSize, mutRate, targetPhrase) {
-    let [bestPhrase, bestScore, totalFitScore, population, fitness] = setupSimulation(popSize, targetPhrase);
+    let [bestPhrase, bestScore, totalFitScore, population, fitness, totalGenerations, avgFitness, success] = setupSimulation(popSize, targetPhrase);
+    if (success) {
+        return;
+    }
 
     while(true) {
-        runSimulationStep(bestPhrase, bestScore, totalFitScore, population, fitness);
+        await new Promise(resolve => setTimeout(resolve, 0));
+        [bestPhrase, bestScore, totalFitScore, population, fitness, totalGenerations, avgFitness, success] = runSimulationStep(bestPhrase, bestScore, totalFitScore, population, fitness, popSize, mutRate, targetPhrase, totalGenerations, avgFitness);
+
+       if (success) {
+        return;
+       } 
     }
 }
