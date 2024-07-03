@@ -72,12 +72,31 @@ document.getElementById("start").addEventListener("click", () => {
     let popSize = document.getElementById("population").value;
     let mutRate = document.getElementById("mutationRate").value;
     let targetPhrase = document.getElementById("target").value;
-    runSimulation(popSize, mutRate, targetPhrase);
+    runSimulation(popSize, mutRate, targetPhrase, "run");
+});
+
+document.getElementById("step").addEventListener("click", () => {
+    document.getElementById("generations").innerText = "Total Generations: 0";
+    document.getElementById("avgFitness").innerText = "Average Fitness: 0%";
+    document.getElementById("allPhrases").innerText = "";
+    document.getElementById("bestPhrase").innerText = "";
+
+    let popSize = document.getElementById("population").value;
+    let mutRate = document.getElementById("mutationRate").value;
+    let targetPhrase = document.getElementById("target").value;
+    runSimulation(popSize, mutRate, targetPhrase, "step");
 });
 
 document.getElementById("cancel").addEventListener("click", () => {
     cancel = true;
-    setTimeout(() => { cancel = false; }, 10);
+
+    setTimeout(() => { 
+        cancel = false; 
+        document.getElementById("generations").innerText = "Total Generations: 0";
+        document.getElementById("avgFitness").innerText = "Average Fitness: 0%";
+        document.getElementById("allPhrases").innerText = "";
+        document.getElementById("bestPhrase").innerText = "";
+    }, 10);
 });
 
 
@@ -166,14 +185,21 @@ function runSimulationStep(bestPhrase, bestScore, totalFitScore, population, fit
 }
 
 
-async function runSimulation(popSize, mutRate, targetPhrase) {
+async function runSimulation(popSize, mutRate, targetPhrase, type) {
     let [bestPhrase, bestScore, totalFitScore, population, fitness, totalGenerations, avgFitness, success] = setupSimulation(popSize, targetPhrase);
     if (success) {
         return;
     }
 
     while(true) {
-        await new Promise(resolve => setTimeout(resolve, 0));
+        if (type === "run") {
+            await new Promise(resolve => setTimeout(resolve, 0));
+        }
+        if (type === "step") {
+            await new Promise(resolve => document.getElementById("next").addEventListener("click", () => {
+                resolve();
+            }, {once: true}));
+        }
         [bestPhrase, bestScore, totalFitScore, population, fitness, totalGenerations, avgFitness, success] = runSimulationStep(bestPhrase, bestScore, totalFitScore, population, fitness, popSize, mutRate, targetPhrase, totalGenerations, avgFitness);
 
         if (cancel) { return; }
