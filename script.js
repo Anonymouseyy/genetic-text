@@ -1,4 +1,5 @@
 const characters = " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789,.?!";
+let cancel = false;
 
 function generateRandomString(length) {
     let result = "";
@@ -72,6 +73,11 @@ document.getElementById("start").addEventListener("click", () => {
     let mutRate = document.getElementById("mutationRate").value;
     let targetPhrase = document.getElementById("target").value;
     runSimulation(popSize, mutRate, targetPhrase);
+});
+
+document.getElementById("cancel").addEventListener("click", () => {
+    cancel = true;
+    setTimeout(() => { cancel = false; }, 10);
 });
 
 
@@ -170,8 +176,10 @@ async function runSimulation(popSize, mutRate, targetPhrase) {
         await new Promise(resolve => setTimeout(resolve, 0));
         [bestPhrase, bestScore, totalFitScore, population, fitness, totalGenerations, avgFitness, success] = runSimulationStep(bestPhrase, bestScore, totalFitScore, population, fitness, popSize, mutRate, targetPhrase, totalGenerations, avgFitness);
 
-       if (success) {
-        return;
-       } 
+        if (cancel) { return; }
+
+        if (success) {
+            return;
+        } 
     }
 }
