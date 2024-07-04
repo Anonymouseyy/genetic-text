@@ -27,9 +27,23 @@ function getFitness(str, target) {
     return correct/total;
 }
 
-function cross(str1, str2) {
+function crossHalfHalf(str1, str2) {
     let l = str1.length;
     return str1.slice(0, Math.floor(l/2)) + str2.slice(Math.floor(l/2));
+}
+
+function crossMixed(str1, str2) {
+    let ret = "";
+    
+    for (let i = 0; i < str1.length; i++) {
+        if (i%2 === 0) {
+            ret += str1.charAt(i);
+        } else {
+            ret += str2.charAt(i);
+        }
+    }
+
+    return ret;
 }
 
 function selectRandom(probabilities, sum=undefined) {
@@ -143,11 +157,19 @@ function setupSimulation(popSize, targetPhrase) {
 function runSimulationStep(bestPhrase, bestScore, totalFitScore, population, fitness, popSize, mutRate, targetPhrase, totalGenerations, avgFitness) {
     let newPop = [];
     for (let i = 0; i < popSize; i++) {
-        newPop.push(
-            mutate(
-                cross(population[selectRandom(fitness, totalFitScore)], population[selectRandom(fitness, totalFitScore)]
-            ), mutRate)
-        );
+        if (Math.random() < 0.5) {
+            newPop.push(
+                mutate(
+                    crossHalfHalf(population[selectRandom(fitness, totalFitScore)], population[selectRandom(fitness, totalFitScore)]
+                ), mutRate)
+            );
+        } else {
+            newPop.push(
+                mutate(
+                    crossMixed(population[selectRandom(fitness, totalFitScore)], population[selectRandom(fitness, totalFitScore)]
+                ), mutRate)
+            );
+        }
     }
     console.log(newPop)
 
