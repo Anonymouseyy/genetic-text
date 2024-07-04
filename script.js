@@ -1,4 +1,5 @@
 const characters = " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789,.?!";
+let allPhrases = "";
 let cancel = false;
 
 function generateRandomString(length) {
@@ -34,7 +35,7 @@ function crossHalfHalf(str1, str2) {
 
 function crossMixed(str1, str2) {
     let ret = "";
-    
+
     for (let i = 0; i < str1.length; i++) {
         if (i%2 === 0) {
             ret += str1.charAt(i);
@@ -83,6 +84,7 @@ document.getElementById("start").addEventListener("click", () => {
     document.getElementById("allPhrases").innerText = "";
     document.getElementById("bestPhrase").innerText = "";
 
+    allPhrases = "";
     let popSize = document.getElementById("population").value;
     let mutRate = document.getElementById("mutationRate").value;
     let targetPhrase = document.getElementById("target").value;
@@ -95,6 +97,7 @@ document.getElementById("step").addEventListener("click", () => {
     document.getElementById("allPhrases").innerText = "";
     document.getElementById("bestPhrase").innerText = "";
 
+    allPhrases = "";
     let popSize = document.getElementById("population").value;
     let mutRate = document.getElementById("mutationRate").value;
     let targetPhrase = document.getElementById("target").value;
@@ -110,7 +113,17 @@ document.getElementById("cancel").addEventListener("click", () => {
         document.getElementById("avgFitness").innerText = "Average Fitness: 0%";
         document.getElementById("allPhrases").innerText = "";
         document.getElementById("bestPhrase").innerText = "";
+        allPhrases = "";
     }, 10);
+});
+
+document.getElementById("download").addEventListener("click", () => {
+    const link = document.createElement("a");
+    const file = new Blob([allPhrases], { type: 'text/plain' });
+    link.href = URL.createObjectURL(file);
+    link.download = "allPhrases.txt";
+    link.click();
+    URL.revokeObjectURL(link.href);
 });
 
 
@@ -122,6 +135,7 @@ function setupSimulation(popSize, targetPhrase) {
         population.push(generateRandomString(length))
     }
     document.getElementById("allPhrases").innerText += population.join("  |  ");
+    allPhrases += population.join("  |  ");
 
     let fitness = [];
     let totalFitScore = 0;
@@ -174,7 +188,8 @@ function runSimulationStep(bestPhrase, bestScore, totalFitScore, population, fit
     console.log(newPop)
 
     population = newPop;
-    document.getElementById("allPhrases").innerText = population.join("  |  ") + document.getElementById("allPhrases").innerText;
+    document.getElementById("allPhrases").innerText = (population.join("  |  ") + document.getElementById("allPhrases").innerText).slice(0, 10000);
+    allPhrases += population.join("  |  ");
 
     fitness = [];
     totalFitScore = 0;
